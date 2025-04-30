@@ -6,6 +6,7 @@ import (
 	"github.com/saksit339/isekai-shop-api-tutorial/config"
 	"github.com/saksit339/isekai-shop-api-tutorial/databases"
 	"github.com/saksit339/isekai-shop-api-tutorial/entities"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -13,34 +14,41 @@ func main() {
 	db := databases.NewPostgresDatabase(conf.Database)
 	fmt.Println(db.ConnectionGetting())
 
-	playerCoinMigration(db)
-	playerMigration(db)
-	adminMigration(db)
-	itemMigration(db)
-	inventoryMigration(db)
-	purcheaseHistoryMigration(db)
+	tx := db.ConnectionGetting().Begin()
 
-}
-func playerMigration(db databases.Database) {
-	db.ConnectionGetting().Migrator().CreateTable(&entities.Player{})
-}
+	playerCoinMigration(tx)
+	playerMigration(tx)
+	adminMigration(tx)
+	itemMigration(tx)
+	inventoryMigration(tx)
+	purcheaseHistoryMigration(tx)
 
-func adminMigration(db databases.Database) {
-	db.ConnectionGetting().Migrator().CreateTable(&entities.Admin{})
+	tx.Commit()
+	if tx.Error != nil {
+		tx.Rollback()
+		panic(tx.Error)
+	}
 }
-
-func itemMigration(db databases.Database) {
-	db.ConnectionGetting().Migrator().CreateTable(&entities.Item{})
-}
-
-func inventoryMigration(db databases.Database) {
-	db.ConnectionGetting().Migrator().CreateTable(&entities.Inventory{})
+func playerMigration(tx *gorm.DB) {
+	tx.Migrator().CreateTable(&entities.Player{})
 }
 
-func playerCoinMigration(db databases.Database) {
-	db.ConnectionGetting().Migrator().CreateTable(&entities.PlayerCoin{})
+func adminMigration(tx *gorm.DB) {
+	tx.Migrator().CreateTable(&entities.Admin{})
 }
 
-func purcheaseHistoryMigration(db databases.Database) {
-	db.ConnectionGetting().Migrator().CreateTable(&entities.PurchaseHistory{})
+func itemMigration(tx *gorm.DB) {
+	tx.Migrator().CreateTable(&entities.Item{})
+}
+
+func inventoryMigration(tx *gorm.DB) {
+	tx.Migrator().CreateTable(&entities.Inventory{})
+}
+
+func playerCoinMigration(tx *gorm.DB) {
+	tx.Migrator().CreateTable(&entities.PlayerCoin{})
+}
+
+func purcheaseHistoryMigration(tx *gorm.DB) {
+	tx.Migrator().CreateTable(&entities.PurchaseHistory{})
 }
