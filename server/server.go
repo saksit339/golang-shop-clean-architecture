@@ -54,6 +54,7 @@ func (s *echoServer) Start() {
 	s.app.Use(timeoutmiddleware)
 
 	s.app.GET("/health", s.healthCheck)
+	s.initItemShopRouter()
 
 	quitch := make(chan os.Signal, 1)
 	signal.Notify(quitch, syscall.SIGINT, syscall.SIGTERM)
