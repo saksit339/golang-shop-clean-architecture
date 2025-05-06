@@ -11,5 +11,4 @@ func main() {
 	db := databases.NewPostgresDatabase(conf.Database)
 	server := server.NewEchoServer(conf, db.ConnectionGetting())
 	server.Start()
-	server.HttpListening()
 }
