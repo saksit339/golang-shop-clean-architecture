@@ -14,8 +14,8 @@ func NewItemShopServiceImpl(itemShopService _itemShopRepository.ItemShopReposito
 	return &itemShopServiceImpl{itemShopService}
 }
 
-func (s *itemShopServiceImpl) Listing() ([]*_itemShopModel.Item, error) {
-	itemList, err := s.itemShopRepository.Listing()
+func (s *itemShopServiceImpl) Listing(itemfilter *_itemShopModel.ItemFilter) ([]*_itemShopModel.Item, error) {
+	itemList, err := s.itemShopRepository.Listing(itemfilter)
 	if err != nil {
 		return nil, err
 	}

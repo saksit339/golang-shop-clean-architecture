@@ -1,7 +1,10 @@
 package repository
 
-import "github.com/saksit339/isekai-shop-api-tutorial/entities"
+import (
+	"github.com/saksit339/isekai-shop-api-tutorial/entities"
+	_itemShopModel "github.com/saksit339/isekai-shop-api-tutorial/pkg/itemShop/model"
+)
 
 type ItemShopRepository interface {
-	Listing() ([]*entities.Item, error)
+	Listing(itemFilter *_itemShopModel.ItemFilter) ([]*entities.Item, error)
 }

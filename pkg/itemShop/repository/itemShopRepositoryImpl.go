@@ -4,6 +4,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/saksit339/isekai-shop-api-tutorial/entities"
 	_itemShopExecptions "github.com/saksit339/isekai-shop-api-tutorial/pkg/itemShop/exception"
+	_itemShopModel "github.com/saksit339/isekai-shop-api-tutorial/pkg/itemShop/model"
+
 	"gorm.io/gorm"
 )
 
@@ -19,9 +21,18 @@ func NewItemShopRepositoryImpl(db *gorm.DB, logger *echo.Logger) ItemShopReposit
 	}
 }
 
-func (r *itemShopRepositoryImpl) Listing() ([]*entities.Item, error) {
+func (r *itemShopRepositoryImpl) Listing(itemfilter *_itemShopModel.ItemFilter) ([]*entities.Item, error) {
 	items := make([]*entities.Item, 0)
-	if err := r.db.Find(&items).Error; err != nil {
+
+	query := r.db.Model(&entities.Item{})
+	if itemfilter.Name != "" {
+		query = query.Where("name LIKE ?", "%"+itemfilter.Name+"%")
+	}
+	if itemfilter.Description != "" {
+		query = query.Where("description LIKE ?", "%"+itemfilter.Description+"%")
+	}
+
+	if err := query.Find(&items).Error; err != nil {
 		r.logger.Print("Error fetching items")
 		return nil, &_itemShopExecptions.ItemListing{}
 	}

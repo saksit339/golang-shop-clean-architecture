@@ -1,9 +1,14 @@
-package validation
+package custom
 
 import (
+	"sync"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
+
+var once sync.Once
+var validate *validator.Validate
 
 type EchoRequest interface {
 	Bind(obj any) error
@@ -15,9 +20,12 @@ type customEchoRequest struct {
 }
 
 func NewCustomEchoRequest(ctx echo.Context) EchoRequest {
+	once.Do(func() {
+		validate = validator.New()
+	})
 	return &customEchoRequest{
 		ctx:       ctx,
-		validator: validator.New(),
+		validator: validate,
 	}
 }
 
@@ -25,7 +33,7 @@ func (c *customEchoRequest) Bind(obj any) error {
 	if err := c.ctx.Bind(obj); err != nil {
 		return err
 	}
-	if err := c.ctx.Validate(obj); err != nil {
+	if err := c.validator.Struct(obj); err != nil {
 		return err
 	}
 	return nil

@@ -5,6 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/saksit339/isekai-shop-api-tutorial/pkg/custom"
+	_custom "github.com/saksit339/isekai-shop-api-tutorial/pkg/custom"
 	_itemShopModel "github.com/saksit339/isekai-shop-api-tutorial/pkg/itemShop/model"
 	_itemShopService "github.com/saksit339/isekai-shop-api-tutorial/pkg/itemShop/service"
 )
@@ -19,14 +20,17 @@ func NewitemShopControllerImpl(itemShopService _itemShopService.ItemShopService)
 
 func (c *itemShopControllerImpl) Listing(ctx echo.Context) error {
 
-	filter := _itemShopModel.ItemFilter{}
-	if err := ctx.Bind(filter); err != nil {
+	filter := new(_itemShopModel.ItemFilter)
+
+	validate := _custom.NewCustomEchoRequest(ctx)
+	if err := validate.Bind(filter); err != nil {
 		return custom.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 
-	itemModelList, err := c.itemShopService.Listing()
+	itemModelList, err := c.itemShopService.Listing(filter)
 	if err != nil {
 		return custom.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
+
 	return ctx.JSON(http.StatusOK, itemModelList)
 }
