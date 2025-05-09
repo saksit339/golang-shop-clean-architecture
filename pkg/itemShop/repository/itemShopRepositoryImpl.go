@@ -31,8 +31,11 @@ func (r *itemShopRepositoryImpl) Listing(itemfilter *_itemShopModel.ItemFilter) 
 	if itemfilter.Description != "" {
 		query = query.Where("description LIKE ?", "%"+itemfilter.Description+"%")
 	}
+	query = query.Where("is_archived = ?", false)
 
-	if err := query.Find(&items).Error; err != nil {
+	offset := (itemfilter.Pagination.Page - 1) * itemfilter.Pagination.Size
+
+	if err := query.Offset(int(offset)).Limit(int(itemfilter.Size)).Find(&items).Error; err != nil {
 		r.logger.Print("Error fetching items")
 		return nil, &_itemShopExecptions.ItemListing{}
 	}
