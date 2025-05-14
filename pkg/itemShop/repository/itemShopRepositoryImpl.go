@@ -41,3 +41,23 @@ func (r *itemShopRepositoryImpl) Listing(itemfilter *_itemShopModel.ItemFilter) 
 	}
 	return items, nil
 }
+
+func (r *itemShopRepositoryImpl) Counting(itemfilter *_itemShopModel.ItemFilter) (int64, error) {
+
+	query := r.db.Model(&entities.Item{})
+	if itemfilter.Name != "" {
+		query = query.Where("name LIKE ?", "%"+itemfilter.Name+"%")
+	}
+	if itemfilter.Description != "" {
+		query = query.Where("description LIKE ?", "%"+itemfilter.Description+"%")
+	}
+	query = query.Where("is_archived = ?", false)
+
+	var count int64
+
+	if err := query.Count(&count).Error; err != nil {
+		r.logger.Print("Error fetching items")
+		return -1, &_itemShopExecptions.ItemListing{}
+	}
+	return count, nil
+}
