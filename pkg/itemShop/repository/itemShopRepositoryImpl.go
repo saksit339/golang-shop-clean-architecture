@@ -56,8 +56,8 @@ func (r *itemShopRepositoryImpl) Counting(itemfilter *_itemShopModel.ItemFilter)
 	var count int64
 
 	if err := query.Count(&count).Error; err != nil {
-		r.logger.Print("Error fetching items")
-		return -1, &_itemShopExecptions.ItemListing{}
+		r.logger.Print("Counting item fail")
+		return -1, &_itemShopExecptions.ItemCounting{}
 	}
 	return count, nil
 }

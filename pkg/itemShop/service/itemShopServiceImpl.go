@@ -14,17 +14,36 @@ func NewItemShopServiceImpl(itemShopService _itemShopRepository.ItemShopReposito
 	return &itemShopServiceImpl{itemShopService}
 }
 
-func (s *itemShopServiceImpl) Listing(itemfilter *_itemShopModel.ItemFilter) ([]*_itemShopModel.Item, error) {
+func (s *itemShopServiceImpl) Listing(itemfilter *_itemShopModel.ItemFilter) (*_itemShopModel.ItemResult, error) {
 	itemList, err := s.itemShopRepository.Listing(itemfilter)
 	if err != nil {
 		return nil, err
 	}
 
-	itemModelList := make([]*_itemShopModel.Item, 0)
-	for _, item := range itemList {
-		itemModel := item.ToItemModel()
-		itemModelList = append(itemModelList, itemModel)
+	itemCounting, err := s.itemShopRepository.Counting(itemfilter)
+	if err != nil {
+		return nil, err
 	}
 
-	return itemModelList, nil
+	totalPage := s.totalPageCalculation(itemCounting, itemfilter.Size)
+
+	itemModelList := make([]_itemShopModel.Item, 0)
+	for _, item := range itemList {
+		itemModel := item.ToItemModel()
+		itemModelList = append(itemModelList, *itemModel)
+	}
+
+	result := _itemShopModel.ItemResult{
+		Items: itemModelList,
+	}
+
+	return &result, nil
+}
+
+func (itemShopServiceImpl) totalPageCalculation(totalIten int64, size int64) int64 {
+	total := totalIten / size
+	if totalIten%size != 0 {
+		total++
+	}
+	return total
 }
