@@ -20,12 +20,12 @@ func (s *itemShopServiceImpl) Listing(itemfilter *_itemShopModel.ItemFilter) (*_
 		return nil, err
 	}
 
-	itemCounting, err := s.itemShopRepository.Counting(itemfilter)
-	if err != nil {
-		return nil, err
-	}
+	// itemCounting, err := s.itemShopRepository.Counting(itemfilter)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	totalPage := s.totalPageCalculation(itemCounting, itemfilter.Size)
+	// totalPage := s.totalPageCalculation(itemCounting, itemfilter.Size)
 
 	itemModelList := make([]_itemShopModel.Item, 0)
 	for _, item := range itemList {
